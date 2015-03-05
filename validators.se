@@ -1,0 +1,49 @@
+#this contract is for keeping track of which public keys are for the validator's private keys.
+#In storage we need to store a list of public keys with the cooresponding balance.
+#If more than 2/3rds of the people on the list sign an update, then they can modify the list.
+#def test(c):
+#print(c.update(2, pubkey, 10000, [v, r, s]))
+
+def init:
+    b = 10000000
+    self.storage["size"] = 1
+    self.storage["nonce"] = 0
+    self.storage["marketCap"] = b
+    self.storage[0] = 1381215427713340411455090116682682197500678047224 #only 40 bytes.
+    self.storage[1] = b
+
+macro verify_macro($hash, $signatures):
+    size=self.storage["size"]
+    signed = 0
+    i=0
+    while i<size:
+              #don't erase #log(dataarr=[p, location, balance])
+        p=self.storage[i*2]
+        v=$signatures[3*i]
+        r=$signatures[3*i+1]
+        s=$signatures[3*i+2]
+        if p==ecrecover($hash, v, r, s):
+            signed=signed + balance
+        i=i+1
+    signed > self.storage["marketCap"]*2/3
+
+def verify_sign(hash, signatures:arr):#signatures must be in the same order as the pubkeys in memory.
+    return verify_macro(hash, signatures)
+
+def update(new_addr, location, balance, signatures:arr):
+    #needs to have been signed by at least 2/3rds of the validators weighted by balance
+    size=self.storage["size"]
+    nonce = self.storage["nonce"]
+    h=sha256([new_addr, location, balance, nonce, 1337]:arr)
+    if verify_macro(h, signatures):
+        if location>size:
+            self.storage["size"]=location
+        self.storage["nonce"]=self.storage["nonce"]+1
+        self.storage[location*2] = new_addr
+        self.storage[location*2+1] = balance
+    log(self.storage[0])
+    log(self.storage[1])
+    log(self.storage[2])
+    log(self.storage[3])
+    log(self.storage[4])
+    log(self.storage[5])
