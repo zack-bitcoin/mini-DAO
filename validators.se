@@ -17,8 +17,9 @@ macro verify_macro($hash, $signatures):
     signed = 0
     i=0
     while i<size:
-              #don't erase #log(dataarr=[p, location, balance])
+        balance=self.storage[(i*2)+1]
         p=self.storage[i*2]
+        #log(dataarr=[p, location, balance])
         v=$signatures[3*i]
         r=$signatures[3*i+1]
         s=$signatures[3*i+2]
@@ -30,7 +31,7 @@ macro verify_macro($hash, $signatures):
 def verify_sign(hash, signatures:arr):#signatures must be in the same order as the pubkeys in memory.
     return verify_macro(hash, signatures)
 
-def update(new_addr, location, balance, signatures:arr):
+def update(new_addr, location, balance, new_market_cap, new_size, signatures:arr):
     #needs to have been signed by at least 2/3rds of the validators weighted by balance
     size=self.storage["size"]
     nonce = self.storage["nonce"]
@@ -41,6 +42,8 @@ def update(new_addr, location, balance, signatures:arr):
         self.storage["nonce"]=self.storage["nonce"]+1
         self.storage[location*2] = new_addr
         self.storage[location*2+1] = balance
+        self.storage["marketCap"] = new_market_cap
+        self.storage["size"] = new_size
     log(self.storage[0])
     log(self.storage[1])
     log(self.storage[2])
