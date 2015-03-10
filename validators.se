@@ -9,7 +9,7 @@ def init:
     self.storage["size"] = 1
     self.storage["nonce"] = 0
     self.storage["marketCap"] = b
-    self.storage[0] = 1381215427713340411455090116682682197500678047224 #only 40 bytes.
+    self.storage[0] = 1381215427713340411455090116682682197500678047224 #address 1 from tester file
     self.storage[1] = b
 
 macro verify_macro($hash, $signatures):
@@ -24,8 +24,8 @@ macro verify_macro($hash, $signatures):
         r=$signatures[3*i+1]
         s=$signatures[3*i+2]
         if p==ecrecover($hash, v, r, s):
-            signed=signed + balance
-        i=i+1
+            signed += balance
+        i += 1
     signed > self.storage["marketCap"]*2/3
 
 def verify_sign(hash, signatures:arr):#signatures must be in the same order as the pubkeys in memory.
@@ -35,11 +35,12 @@ def update(new_addr, location, balance, new_market_cap, new_size, signatures:arr
     #needs to have been signed by at least 2/3rds of the validators weighted by balance
     size=self.storage["size"]
     nonce = self.storage["nonce"]
-    h=sha256([new_addr, location, balance, nonce, 1337]:arr)
+    #h=sha256([new_addr, location, balance, nonce, 1337]:arr)
+    h=sha3([new_addr, location, balance, nonce, 1337]:arr)
     if verify_macro(h, signatures):
         if location>size:
             self.storage["size"]=location
-        self.storage["nonce"]=self.storage["nonce"]+1
+        self.storage["nonce"] = 1 + nonce
         self.storage[location*2] = new_addr
         self.storage[location*2+1] = balance
         self.storage["marketCap"] = new_market_cap

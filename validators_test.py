@@ -9,7 +9,8 @@ def hash_list(l):
     y=[utils.zpad(x, 32) for x in y]
     y=''.join(y)
     #save for pretty print z="".join("{:02x}".format(ord(c)) for c in y)
-    return b.sha256(y)
+    #return b.sha256(y)
+    return utils.sha3(y).encode("hex")
 def mk_acc(n):
     out={"priv":b.sha256("brainwallet"+str(n))}
     out["pub"]=b.privtopub(out["priv"])
